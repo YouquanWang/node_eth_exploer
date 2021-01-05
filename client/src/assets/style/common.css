@@ -1,12 +1,12 @@
-@import './base.scss';
-html,body {
+@charset "UTF-8";
+html, body {
   font-size: 12px;
   line-height: 1.4;
-  font-family: '微软雅黑',Tahoma, Arial, 'Helvetica Neue', 'Hiragino Sans GB', Simsun,
-    sans-self;
+  font-family: '微软雅黑',Tahoma, Arial, 'Helvetica Neue', 'Hiragino Sans GB', Simsun, sans-self;
   background-color: #f2f3f8;
   height: 100%;
 }
+
 *,
 *:before,
 *:after {
@@ -14,21 +14,26 @@ html,body {
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
 }
+
 a {
   text-decoration: none;
 }
+
 input,
 button {
   outline: none;
 }
+
 input[type='number']::-webkit-outer-spin-button,
 input[type='number']::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
+
 input[type='number'] {
   -moz-appearance: textfield;
 }
+
 ::-ms-clear,
 ::-ms-reveal {
   display: none;
@@ -54,6 +59,7 @@ pre {
   margin: 0;
   padding: 0;
 }
+
 h1,
 h2,
 h3,
@@ -62,11 +68,13 @@ h5,
 h6 {
   font-size: 100%;
 }
+
 ul,
 ol {
   list-style: none;
   list-style-position: inside;
 }
+
 article,
 aside,
 details,
@@ -81,6 +89,7 @@ section,
 summary {
   display: block;
 }
+
 audio,
 canvas,
 progress,
@@ -88,25 +97,31 @@ video {
   display: inline-block;
   vertical-align: baseline;
 }
+
 audio:not([controls]) {
   display: none;
   height: 0;
 }
+
 [hidden],
 template {
   display: none;
 }
+
 i,
 em {
   font-style: normal;
 }
+
 a {
   background-color: transparent;
   text-decoration: none;
 }
+
 img {
   border: 0;
 }
+
 textarea {
   overflow: auto;
 }
@@ -114,32 +129,44 @@ textarea {
 .wrapper {
   width: 1200px;
   margin: 0 auto;
-  @include clearfix()
 }
-// 清除浮动
+
+.wrapper::after {
+  display: block;
+  content: '';
+  clear: both;
+}
+
 .clear:before,
 .clear:after {
-    content: " ";
-    display: table;
+  content: " ";
+  display: table;
 }
+
 .clear:after {
-    clear: both;
+  clear: both;
 }
-// 左右浮动
+
 .fl {
   float: left;
 }
+
 .fr {
   float: right;
 }
-// 文字单行省略
+
 .text-ellipsis {
-  @include text-ellipsis(1)
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
-// 文字多行省略
 .multi-ellipsis {
-  @include text-ellipsis(2)
+  text-overflow: ellipsis;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 
 .text-l {
@@ -157,32 +184,28 @@ textarea {
 .flex {
   display: flex;
 }
-// 自适应剩余空间
+
 .flex-item {
   flex: 1;
   min-width: 0;
 }
 
-// 自动换行
 .flex-wrap {
   display: flex;
   flex-wrap: wrap;
 }
 
-// 两侧贴边布局
 .flex-between {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-// 垂直居中对齐
 .flex-middle {
   display: flex;
   align-items: center;
 }
 
-// 文字两侧贴边
 .text-between {
   display: flex;
   justify-content: space-between;
@@ -190,13 +213,12 @@ textarea {
   align-items: flex-end;
 }
 
-
-// 全居中布局
 .flex-center {
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.primary-color{
-  color: $primary-color;
+
+.primary-color {
+  color: #4AB154;
 }

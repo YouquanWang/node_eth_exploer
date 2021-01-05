@@ -6,9 +6,9 @@
   class="el-menu-demo"
   mode="horizontal"
   @select="handleSelect"
-  background-color="#545c64"
+  background-color="#409eff"
   text-color="#fff"
-  active-text-color="#ffd04b">
+  active-text-color="#fff">
   <el-menu-item index="1">首页</el-menu-item>
   <el-submenu index="2">
     <template #title>我的工作台</template>
@@ -41,9 +41,6 @@
   text-align: center;
   color: #2c3e50;
   .el-header{
-    padding: 0;
-  }
-  .el-main{
     padding: 0;
   }
 }
