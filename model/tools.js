@@ -6,7 +6,7 @@ let tools = {
   getSign(json) {
     let keys = Object.keys(json).sort();
     let str = 'yangwu999';
-    for (var item of keys) {
+    for (let item of keys) {
       str += item + json[item]
     }
     return md5(str)
