@@ -11,7 +11,7 @@ class EthModel {
     // this.getGasPrice()
     // this.getBlock()
     // this.getBalance()
-    this.updateData()
+    // this.updateData()
     // this.getTransaction('0x2e298a9d0848271c57b2dd7480df5eeaaf07b7fbce911f39398231c1d15f1c0c')
   }
   async getBlockNumber () {
@@ -41,15 +41,23 @@ class EthModel {
     for (let index = localBlock; index < currentBlock; index++) {
       let blockInfo = await this.getBlock(index)
       let sql = `insert into block (difficulty,extraData,gasLimit,gasUsed,hash,miner,mixHash,nonce,number,parentHash,receiptsRoot,sha3Uncles,size,stateRoot,timestamp,totalDifficulty,transactionsRoot,transactionNum,unclesNum) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`
-      const result = await DB.query(sql, [blockInfo.difficulty,blockInfo.extraData,blockInfo.gasLimit,blockInfo.gasUsed,blockInfo.hash,blockInfo.miner,blockInfo.mixHash,blockInfo.nonce,blockInfo.number,blockInfo.parentHash,blockInfo.receiptsRoot,blockInfo.sha3Uncles,blockInfo.size,blockInfo.stateRoot,blockInfo.timestamp,blockInfo.totalDifficulty,blockInfo.transactionsRoot,blockInfo.transactions.length,blockInfo.uncles.length]); 
+      let selectSql = `select * from block where number=?`
+      let result = await DB.query(selectSql, blockInfo.number)
+      if(!result.length) {
+        await DB.query(sql, [blockInfo.difficulty,blockInfo.extraData,blockInfo.gasLimit,blockInfo.gasUsed,blockInfo.hash,blockInfo.miner,blockInfo.mixHash,blockInfo.nonce,blockInfo.number,blockInfo.parentHash,blockInfo.receiptsRoot,blockInfo.sha3Uncles,blockInfo.size,blockInfo.stateRoot,blockInfo.timestamp,blockInfo.totalDifficulty,blockInfo.transactionsRoot,blockInfo.transactions.length,blockInfo.uncles.length]); 
+      }
       let tLength = blockInfo.transactions.length
       let tsql = `insert into transaction (blockHash,blockNumber,fromAddress,gas,gasPrice,hash,input,nonce,toAddress,ethValue) values (?,?,?,?,?,?,?,?,?,?)`
+      let selectTsql = `select * from transaction where hash=?`
       if (tLength) {
         for (let tindex = 0; tindex < tLength; tindex++) {
           let hash = blockInfo.transactions[tindex];
-          let transactionInfo = await this.getTransaction(hash)
-          // console.log(transactionInfo)
-          await DB.query(tsql, [transactionInfo.blockHash,transactionInfo.blockNumber,transactionInfo.from,transactionInfo.gas,transactionInfo.gasPrice,transactionInfo.hash,transactionInfo.input,transactionInfo.nonce,transactionInfo.to,transactionInfo.value])
+          let sresult = await DB.query(selectTsql, hash)
+          if (!sresult.length) {
+            let transactionInfo = await this.getTransaction(hash)
+            // console.log(transactionInfo)
+            await DB.query(tsql, [transactionInfo.blockHash,transactionInfo.blockNumber,transactionInfo.from,transactionInfo.gas,transactionInfo.gasPrice,transactionInfo.hash,transactionInfo.input,transactionInfo.nonce,transactionInfo.to,transactionInfo.value])  
+          }
         }
       }
       fs.writeFileSync(`${__dirname}/block.txt`, blockInfo.number.toString())

@@ -4,6 +4,8 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var ejs = require('ejs');
+var ethModel = require('./model/ethModel')
+var schedule = require('node-schedule');
 var indexRouter = require('./routes/index');
 var app = express();
 
@@ -42,5 +44,12 @@ app.use(function(err, req, res, next) {
   // render the error page
   res.status(err.status || 500);
   res.render('error');
+});
+var rule = new schedule.RecurrenceRule();
+rule.minute = [0,5,10,15,20,25,30,35,40,45,50,55];
+var EthModel = new ethModel()
+var j = schedule.scheduleJob(rule,() => {
+    EthModel.updateData()
+    console.log("执行任务："+new Date());
 });
 module.exports = app;
