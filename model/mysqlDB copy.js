@@ -7,7 +7,7 @@ function __pool() {
         database: 'explore',
         port: '3306',
         multipleStatements: true,
-        connectionLimit: 100000000000
+        connectionLimit: 100000
     });
     return pool;
 }
@@ -20,11 +20,11 @@ exports.query = function (sql, parmas = null) {
                 return
               }
             connection.query(sql, parmas, (error, results, fields) => {
+                connection.release()
                 if (error) {
                   resolve(error);
                   return
                 }
-                connection.release()
                 reject(results);
             });
         })

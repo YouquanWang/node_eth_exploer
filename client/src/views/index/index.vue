@@ -5,7 +5,7 @@
         <div class="grid-content">
           <div class="content" style="margin-left: 0">
             <div class="title">区块高度</div>
-            <div class="text">120000</div>
+            <div class="text">{{blockNumber}}</div>
           </div>
         </div>
       </el-col>
@@ -13,7 +13,7 @@
         <div class="grid-content">
           <div class="content">
             <div class="title">交易费</div>
-            <div class="text">20Gwei</div>
+            <div class="text">{{gasPrice}}Gwei</div>
           </div>
         </div>
       </el-col>
@@ -21,7 +21,7 @@
         <div class="grid-content">
           <div class="content">
             <div class="title">难度值</div>
-            <div class="text">20Gwei</div>
+            <div class="text">{{difficulty}}</div>
           </div>
         </div>
       </el-col>
@@ -29,7 +29,7 @@
         <div class="grid-content">
           <div class="content" style="margin-right: 0">
             <div class="title">哈希率</div>
-            <div class="text">20Gwei</div>
+            <div class="text">{{hashrate}}</div>
           </div>
         </div>
       </el-col>
@@ -42,15 +42,33 @@
               <span>区块高度</span>
             </div>
           </template>
-          <el-table :data="tableData" style="width: 100%">
-            <el-table-column prop="date" label="区块高度"></el-table-column>
-            <el-table-column prop="name" label="区块哈希值"></el-table-column>
-            <el-table-column prop="name" label="交易次数"></el-table-column>
+          <el-table 
+          :data="blockList"
+           @row-click="toBlockDetail"
+          style="width: 100%">
+            <el-table-column label="区块高度" width="100px">
+              <template #default="scope">
+                <span class="text-ellipsis">{{scope.row.number}}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="区块哈希值">
+              <template #default="scope">
+                <span class="text-ellipsis">{{scope.row.hash}}</span>
+              </template>
+            </el-table-column>
+            <el-table-column width="80px" prop="transactionNum" label="交易次数"></el-table-column>
             <el-table-column
-              prop="address"
               label="区块生成者"
-            ></el-table-column>
-            <el-table-column prop="address" label="生成时间"></el-table-column>
+            >
+             <template #default="scope">
+                <span class="text-ellipsis">{{scope.row.miner}}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="生成时间">
+               <template #default="scope">
+                <span class="text-ellipsis">{{dateFormat('yyyy-MM-dd hh:mm:ss',new Date(scope.row.timestamp*1000))}}</span>
+              </template>
+            </el-table-column>
           </el-table>
         </el-card>
       </el-col>
@@ -61,13 +79,36 @@
               <span>交易记录</span>
             </div>
           </template>
-          <el-table :data="tableData" style="width: 100%">
-            <el-table-column prop="date" label="区块高度"></el-table-column>
-            <el-table-column prop="name" label="HASH"></el-table-column>
-            <el-table-column prop="name" label="转出地址"></el-table-column>
-            <el-table-column prop="address" label="转入地址"></el-table-column>
-            <el-table-column prop="address" label="数量"></el-table-column>
-            <el-table-column prop="address" label="时间"></el-table-column>
+          <el-table 
+          :data="transactionList" 
+          @row-click="toTransactionDetail"
+          style="width: 100%">
+            <el-table-column prop="blockNumber" label="区块高度"></el-table-column>
+            <el-table-column label="HASH">
+              <template #default="scope">
+                <span class="text-ellipsis">{{scope.row.hash}}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="转出地址">
+              <template #default="scope">
+                <span class="text-ellipsis">{{scope.row.fromAddress}}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="转入地址">
+              <template #default="scope">
+                <span class="text-ellipsis">{{scope.row.toAddress}}</span>
+              </template>
+            </el-table-column>
+            <el-table-column width="80px" label="数量">
+               <template #default="scope">
+                <span class="text-ellipsis">{{web3.utils.fromWei(scope.row.ethValue, 'ether')}} eth</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="时间">
+               <template #default="scope">
+                <span class="text-ellipsis">{{dateFormat('yyyy-MM-dd hh:mm:ss',new Date(scope.row.timestamp*1000))}}</span>
+              </template>
+            </el-table-column>
           </el-table>
         </el-card>
       </el-col>
@@ -76,9 +117,52 @@
 </template>
 
 <script>
+import { reactive, toRefs, onMounted } from "vue";
+import {useRouter} from "vue-router"
+import { getGasPrice, getHashrate, getBlockNumber, getBlockInfo, getBlockList, getTransactionList } from '@/api'
 export default {
-  name: "Home",
-  components: {}
+  components: {},
+  setup () {
+    const router = useRouter()
+    const data = reactive({
+       blockNumber: 0,
+       hashrate: 0,
+       gasPrice: 0,
+       difficulty: 0,
+       blockList: [],
+       transactionList: [],
+       toBlockDetail: (row, column, event) => {
+         router.push({name: 'BlockDetial', params: {blockNumber: row.number}})
+       },
+       toTransactionDetail: (row, column, event) =>{
+         router.push({name: 'TransactionDetial', params: {hash: row.hash}})
+       }
+    });
+    onMounted(() => {
+      getGasPrice().then((res) => {
+        data.gasPrice = res.data
+      })
+      getHashrate().then((res) => {
+        data.hashrate = res.data
+      })
+      getBlockNumber().then((res) => {
+        data.blockNumber = res.data
+        return getBlockInfo({blockNumber: res.data})
+      }).then((block) => {
+        data.difficulty = block.data.difficulty
+      })
+      getBlockList().then((res) => {
+        data.blockList = res.data
+      })
+      getTransactionList().then((res) => {
+        data.transactionList = res.data
+      })
+    })
+    const refData = toRefs(data)
+    return {
+      ...refData
+    }
+  }
 };
 </script>
 

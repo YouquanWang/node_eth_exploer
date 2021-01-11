@@ -1,6 +1,6 @@
 import axios from "axios";
 import qs from "qs";
-import Vue from "vue";
+import { ElMessage } from 'element-plus'
 
 const http = axios.create()
 http.defaults.withCredentials = true;
@@ -24,7 +24,7 @@ http.interceptors.request.use(config => {
 http.interceptors.response.use(response => {
   let data = response.data;
   if (typeof data === "object" && data.status !== 1) {
-    Vue.prototype.$message(data.msg, "error");
+    ElMessage.error(data.msg);
     return Promise.reject(response.data);
   }
   return response.data;

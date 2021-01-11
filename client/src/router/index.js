@@ -14,10 +14,22 @@ const routes = [
       import(/* webpackChunkName: "Block" */ "../views/block")
   },
   {
+    path: "/block/detial/:blockNumber",
+    name: "BlockDetial",
+    component: () =>
+      import(/* webpackChunkName: "BlockDetial" */ "../views/block/detial")
+  },
+  {
     path: "/transaction",
     name: "Transaction",
     component: () =>
       import(/* webpackChunkName: "Transaction" */ "../views/transaction")
+  },
+  {
+    path: "/transaction/detial/:hash",
+    name: "TransactionDetial",
+    component: () =>
+      import(/* webpackChunkName: "TransactionDetial" */ "../views/transaction/detial")
   }
 ];
 
